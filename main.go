@@ -64,11 +64,16 @@ func main() {
 	})
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    "localhost:8080",
 		Handler: loggingRequest(router),
 	}
 
-	log.Fatal().Msg(server.ListenAndServe().Error())
+	log.Info().
+		Str(`Server run`, server.Addr).
+		Send()
+
+	err := server.ListenAndServe()
+	log.Error().Msg(err.Error())
 
 }
 
