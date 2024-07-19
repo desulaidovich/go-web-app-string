@@ -47,6 +47,7 @@ func main() {
 				"method":     r.Method,
 				"path":       r.URL.Path,
 				"error_code": strconv.Itoa(http.StatusBadRequest),
+				"name":       "null params",
 			})
 			w.Write(reqJSON)
 			return
@@ -76,6 +77,7 @@ func main() {
 				"method":     r.Method,
 				"path":       r.URL.Path,
 				"error_code": strconv.Itoa(http.StatusBadRequest),
+				"name":       "null params",
 			})
 			w.Write(reqJSON)
 			return
