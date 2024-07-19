@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -18,7 +19,6 @@ func main() {
 
 	loggingRequest := func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
 			log.Debug().
 				Str("FROM", r.RemoteAddr).
 				Str("METHOD", r.Method).
@@ -32,17 +32,28 @@ func main() {
 
 	// .../decrypt?value=VALUE
 	router.HandleFunc("GET /decrypt", func(w http.ResponseWriter, r *http.Request) {
-		value := r.URL.Query().Get("value")
+		var (
+			value   string
+			reqJSON []byte
+		)
+
+		value = r.URL.Query().Get("value")
+
+		w.Header().Set("Content-Type", "application/json")
 
 		if len(value) == 0 {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("NULL"))
+			reqJSON, _ = json.Marshal(map[string]string{
+				"method":     r.Method,
+				"path":       r.URL.Path,
+				"error_code": strconv.Itoa(http.StatusBadRequest),
+			})
+			w.Write(reqJSON)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		reqJSON, _ := json.Marshal(map[string]string{
+		reqJSON, _ = json.Marshal(map[string]string{
 			"decrypt": DecryptLetters(value),
 		})
 		w.Write(reqJSON)
@@ -50,19 +61,31 @@ func main() {
 
 	// .../encrypt?value=VALUE
 	router.HandleFunc("GET /encrypt", func(w http.ResponseWriter, r *http.Request) {
-		value := r.URL.Query().Get("value")
+		var (
+			value   string
+			reqJSON []byte
+		)
+
+		value = r.URL.Query().Get("value")
+
+		w.Header().Set("Content-Type", "application/json")
 
 		if len(value) == 0 {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("NULL"))
+			reqJSON, _ = json.Marshal(map[string]string{
+				"method":     r.Method,
+				"path":       r.URL.Path,
+				"error_code": strconv.Itoa(http.StatusBadRequest),
+			})
+			w.Write(reqJSON)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		reqJSON, _ := json.Marshal(map[string]string{
+		reqJSON, _ = json.Marshal(map[string]string{
 			"encrypt": EncryptLetter(value),
 		})
+
 		w.Write(reqJSON)
 	})
 
@@ -77,7 +100,6 @@ func main() {
 
 	err := server.ListenAndServe()
 	log.Error().Msg(err.Error())
-
 }
 
 func EncryptLetter(input string) string {
