@@ -28,19 +28,17 @@ func main() {
 		})
 	}
 
-	nullValue := func(value string, w http.ResponseWriter) {
-		if len(value) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("NULL"))
-		}
-	}
-
 	router := http.NewServeMux()
+
 	// .../decrypt?value=VALUE
 	router.HandleFunc("GET /decrypt", func(w http.ResponseWriter, r *http.Request) {
 		value := r.URL.Query().Get("value")
 
-		nullValue(value, w)
+		if len(value) == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("NULL"))
+			return
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -49,11 +47,16 @@ func main() {
 		})
 		w.Write(reqJSON)
 	})
+
 	// .../encrypt?value=VALUE
 	router.HandleFunc("GET /encrypt", func(w http.ResponseWriter, r *http.Request) {
 		value := r.URL.Query().Get("value")
 
-		nullValue(value, w)
+		if len(value) == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("NULL"))
+			return
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
