@@ -6,7 +6,9 @@ import (
 	"unicode"
 )
 
-func EncryptLetter(input string) string {
+type Cryproher struct{}
+
+func (c *Cryproher) EncryptLetter(input string) string {
 	inputeLen := len(input)
 	buff := &bytes.Buffer{}
 	char := byte(0)
@@ -93,7 +95,7 @@ func expandExpression(input string) (string, bool) {
 	return string(buff), true
 }
 
-func DecryptLetters(input string) string {
+func (c *Cryproher) DecryptLetters(input string) string {
 	buff, ok := expandExpression(input)
 
 	for {

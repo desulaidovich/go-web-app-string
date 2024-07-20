@@ -9,14 +9,15 @@ import (
 func Run() {
 	log := logger.New()
 
-	router := http.NewServeMux()
+	mux := http.NewServeMux()
+	r := routes.New(mux)
 
-	router.HandleFunc("GET /encrypt", routes.Encrypt)
-	router.HandleFunc("GET /decrypt", routes.Decrypt)
+	mux.HandleFunc("GET /encrypt", r.Encrypt)
+	mux.HandleFunc("GET /decrypt", r.Decrypt)
 
 	server := &http.Server{
 		Addr:    "localhost:8080",
-		Handler: log.Init(router),
+		Handler: log.Init(mux),
 	}
 
 	log.Info().Str(`Server run`, server.Addr).Send()

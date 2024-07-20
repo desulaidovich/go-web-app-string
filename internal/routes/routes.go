@@ -7,7 +7,20 @@ import (
 	"strconv"
 )
 
-func Decrypt(w http.ResponseWriter, r *http.Request) {
+type Route struct {
+	*http.ServeMux
+	cryproher.Cryproher
+}
+
+func New(s *http.ServeMux) *Route {
+	var crypto cryproher.Cryproher
+
+	return &Route{
+		s, crypto,
+	}
+}
+
+func (s *Route) Decrypt(w http.ResponseWriter, r *http.Request) {
 	var (
 		value   string
 		reqJSON []byte
@@ -31,12 +44,12 @@ func Decrypt(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	reqJSON, _ = json.Marshal(map[string]string{
-		"decrypt": cryproher.DecryptLetters(value),
+		"decrypt": s.DecryptLetters(value),
 	})
 	w.Write(reqJSON)
 }
 
-func Encrypt(w http.ResponseWriter, r *http.Request) {
+func (s *Route) Encrypt(w http.ResponseWriter, r *http.Request) {
 	var (
 		value   string
 		reqJSON []byte
@@ -60,7 +73,7 @@ func Encrypt(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	reqJSON, _ = json.Marshal(map[string]string{
-		"encrypt": cryproher.EncryptLetter(value),
+		"encrypt": s.EncryptLetter(value),
 	})
 
 	w.Write(reqJSON)
