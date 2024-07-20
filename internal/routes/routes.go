@@ -75,6 +75,5 @@ func (s *Route) Encrypt(w http.ResponseWriter, r *http.Request) {
 	reqJSON, _ = json.Marshal(map[string]string{
 		"encrypt": s.EncryptLetter(value),
 	})
-
 	w.Write(reqJSON)
 }
