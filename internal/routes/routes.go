@@ -71,9 +71,12 @@ func (s *Route) Encrypt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	letters := s.EncryptLetter(value)
+	lettersExp := s.EncryptExpr(letters)
+
 	w.WriteHeader(http.StatusOK)
 	reqJSON, _ = json.Marshal(map[string]string{
-		"encrypt": s.EncryptLetter(value),
+		"encrypt": lettersExp,
 	})
 	w.Write(reqJSON)
 }

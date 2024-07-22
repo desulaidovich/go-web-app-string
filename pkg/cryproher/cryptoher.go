@@ -8,6 +8,27 @@ import (
 
 type Cryproher struct{}
 
+func (c *Cryproher) EncryptExpr(input string) string {
+	for i := range input {
+		for j := range input {
+			if i >= j {
+				continue
+			}
+			firstSlice := input[i : j+1]
+			secondSlice := input[j+1:]
+
+			if firstSlice == secondSlice {
+				return "2(" + firstSlice + ")"
+			}
+
+			if strings.Index(secondSlice, firstSlice) == 0 {
+				return "2(" + input[i:j+1] + ")" + input[j+1+(len(input[i:j+1])-1)+1:]
+			}
+		}
+	}
+	return input
+}
+
 func (c *Cryproher) EncryptLetter(input string) string {
 	inputeLen := len(input)
 	buff := &bytes.Buffer{}
