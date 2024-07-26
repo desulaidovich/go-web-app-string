@@ -2,34 +2,54 @@ package cryproher
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"unicode"
 )
 
 type Cryproher struct{}
 
-func (c *Cryproher) EncryptExpr(input string) string {
-	for i := range input {
-		for j := range input {
-			if i >= j {
+func (c *Cryproher) EncryptLetters(input string) string {
+	buff := encryptLetter(input)
+	buff, ok := encryptExpr(buff)
+
+	for {
+		if !ok {
+			break
+		}
+		buff, ok = encryptExpr(buff)
+	}
+	return buff
+}
+
+func encryptExpr(input string) (string, bool) {
+	count := 1
+	for i := 0; i < len(input); i++ {
+		for j := i; j < len(input); j++ {
+			inputLen := len(input[i:j])
+			if inputLen == 0 {
 				continue
 			}
-			firstSlice := input[i : j+1]
-			secondSlice := input[j+1:]
-
-			if firstSlice == secondSlice {
-				return "2(" + firstSlice + ")"
+			if inputLen+j > len(input) {
+				break
 			}
+			if input[i:j] == input[j:inputLen+j] {
+				count++
+				str := fmt.Sprintf("%s%d(%s)%s",
+					input[:i], count, input[i:j], input[inputLen+j:])
 
-			if strings.Index(secondSlice, firstSlice) == 0 {
-				return "2(" + input[i:j+1] + ")" + input[j+1+(len(input[i:j+1])-1)+1:]
+				if strings.Index(str, "()") > 0 {
+					return input, false
+				}
+
+				return str, true
 			}
 		}
 	}
-	return input
+	return input, false
 }
 
-func (c *Cryproher) EncryptLetter(input string) string {
+func encryptLetter(input string) string {
 	inputeLen := len(input)
 	buff := &bytes.Buffer{}
 	char := byte(0)
